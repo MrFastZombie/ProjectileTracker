@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -11,6 +11,27 @@
       <HintPath>$(VINTAGE_STORY)/VintagestoryAPI.dll</HintPath>
       <Private>false</Private>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(VINTAGE_STORY)\Lib\0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+        <Reference Include="VSSurvivalMod">
+            <HintPath>$(VINTAGE_STORY)\Mods\VSSurvivalMod.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+        <Reference Include="VSEssentials">
+            <HintPath>$(VINTAGE_STORY)\Mods\VSEssentials.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
   </ItemGroup>
 
 <ItemGroup>
