@@ -8,6 +8,7 @@ using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 using System.Linq;
 using System;
+using System.Reflection;
 using ProtoBuf;
 
 namespace ProjectileTracker;
@@ -68,6 +69,11 @@ public class ProjectileTrackerModSystem : ModSystem
             .RegisterMessageType(typeof(NetworkApiMessage))
             .RegisterMessageType(typeof(NetworkApiResponse))
             .SetMessageHandler<NetworkApiResponse>(OnClientMessage);
+
+        api.ChatCommands.Create("ptpurge")
+            .WithDescription("Purge all Projectile Tracker waypoints")
+            .RequiresPrivilege(Privilege.chat)
+            .HandleWith(new OnCommandDelegate(OnPurgeCommand));
         
         api.ChatCommands.Create("pttest")
             .WithDescription("Test command")
@@ -80,6 +86,25 @@ public class ProjectileTrackerModSystem : ModSystem
         serverChannel.BroadcastPacket(new NetworkApiMessage() {
             message = "test",
         });
+        return TextCommandResult.Success();
+    }
+
+    private TextCommandResult OnPurgeCommand(TextCommandCallingArgs args) {
+        MethodInfo ResendWaypoints = typeof(WaypointMapLayer).GetMethod("ResendWaypoints", BindingFlags.NonPublic | BindingFlags.Instance);
+        MethodInfo RebuildMapComponents = typeof(WaypointMapLayer).GetMethod("RebuildMapComponents", BindingFlags.NonPublic | BindingFlags.Instance);
+        
+        //Code here
+        var maplayer = serverAPI.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
+        var waypoints = maplayer.Waypoints;
+
+        foreach (Waypoint waypoint in waypoints.ToList()) {
+            if(waypoint.Title.StartsWith("Projectile ") && waypoint.OwningPlayerUid == args.Caller.Player.PlayerUID) {
+                waypoints.Remove(waypoint);
+                ResendWaypoints.Invoke(maplayer, new Object[] { args.Caller.Player as IServerPlayer });
+                RebuildMapComponents.Invoke(maplayer, null);
+            }
+        }
+
         return TextCommandResult.Success();
     }
 
