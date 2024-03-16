@@ -107,6 +107,11 @@ namespace ProjectileTracker.EntityBehavior {
             foreach (Waypoint waypoint in waypoints.ToList().Where(w => w.OwningPlayerUid == player.PlayerUID))
             {
                 if(waypoint.Title == "Projectile " + p.EntityId) {
+                    if(player == null) {
+                        api.Logger.Log(EnumLogType.Error, "Projectile " + p.EntityId + " had a waypoint for player " + waypoint.OwningPlayerUid + " but that player could not be retrieved. If this happened during a world load, this can be ignored!");
+                        continue;
+                    }
+
                     waypoints.Remove(waypoint);
                     ResendWaypoints.Invoke(maplayer, new Object[] { player });
                     RebuildMapComponents.Invoke(maplayer, null);
@@ -114,7 +119,7 @@ namespace ProjectileTracker.EntityBehavior {
             }
         }
 
-        //Until https://github.com/anegostudios/VintageStory-Issues/issues/3723 is fixed, this method will remove orphaned waypoints.
+        //Until https://github.com/anegostudios/VintageStory-Issues/issues/3723 is fixed, this method will remove waypoints for orphaned projectiles.
         private void RemoveOrphanedWaypoint(ICoreServerAPI api, EntityProjectile p) {
             var maplayer = api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
             var waypoints = getWaypoints(api);
@@ -122,8 +127,14 @@ namespace ProjectileTracker.EntityBehavior {
             foreach (Waypoint waypoint in waypoints.ToList())
             {
                 if(waypoint.Title == "Projectile " + p.EntityId) {
+                    var player = api.World.PlayerByUid(waypoint.OwningPlayerUid);
+                    if(player == null) {
+                        api.Logger.Log(EnumLogType.Error, "Orphaned projectile " + p.EntityId + " had a waypoint for player " + waypoint.OwningPlayerUid + " but that player could not be retrieved.");
+                        continue;
+                    }
+
                     waypoints.Remove(waypoint);
-                    ResendWaypoints.Invoke(maplayer, new Object[] {api.World.PlayerByUid(waypoint.OwningPlayerUid) as IServerPlayer});
+                    ResendWaypoints.Invoke(maplayer, new Object[] {player as IServerPlayer});
                     RebuildMapComponents.Invoke(maplayer, null);
                 }
             }
