@@ -55,6 +55,7 @@ namespace ProjectileTracker.EntityBehavior {
             base.OnGameTick(deltaTime);
 
             if(checkArrow.FiredBy == null) return; //No point in making a waypoint if the player is null.
+            if(checkArrow.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
 
             //Figuring out how to make this work drove me nuts, but this appears to be the most reliable way to check if the projectile has landed without access to onCollided.
             if(projectileLanded[checkArrow.EntityId] == true) return;
