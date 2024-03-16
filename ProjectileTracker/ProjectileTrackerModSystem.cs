@@ -61,7 +61,6 @@ public class ProjectileTrackerModSystem : ModSystem
         serverAPI = api;
         base.StartServerSide(api);
         api.RegisterEntityBehaviorClass("InjectProjectileTracker", typeof(InjectProjectileTracker)); //This behavior class contains the logic for detecting projectiles on the server side.
-        api.RegisterEntity("EntityProjectileInjector", typeof(EntityProjectileInjector));
         //var waypoints = (api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer).Waypoints;
         
         serverChannel = 
