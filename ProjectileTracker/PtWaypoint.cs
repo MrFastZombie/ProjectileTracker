@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using Vintagestory.API.Util;
 
 namespace ProjectileTracker;
 class PtWaypoint
@@ -25,7 +26,7 @@ class PtWaypoint
             Title = "Projectile " + p.EntityId,
             Pinned = false,
             Icon = playerConfig.icon,
-            Color = ColorUtil.Hex2Int(playerConfig.color),
+            Color = System.Drawing.ColorTranslator.FromHtml(playerConfig.color).ToArgb(),
             OwningPlayerUid = player.PlayerUID
         };
 

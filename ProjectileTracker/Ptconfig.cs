@@ -10,7 +10,7 @@ public class Ptconfig
 
     public bool allowWelcomeMessage = true;
     public string icon = "ptarrow";
-    public string color = "#fca7ee";
+    public string color = "#f9d0dc";
 
     public override string ToString()
     {
