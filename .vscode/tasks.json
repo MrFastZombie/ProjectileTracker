@@ -35,6 +35,38 @@
                 "${workspaceFolder}/CakeBuild/CakeBuild.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Enable Mods",
+            "command": "powershell",
+            "type": "process",
+            "args": [
+                "Get-ChildItem",
+                "*.zip.disabled",
+                "|",
+                "ren",
+                "-NewName",
+                "{ $_.Name -replace '.zip.disabled', '.zip' }",
+            ],
+            "options": {
+                "cwd": "${env:APPDATA}\\VintagestoryData\\Mods"
+            }
+        },
+        {
+            "label": "Disable Mods",
+            "command": "powershell",
+            "type": "process",
+            "args": [
+                "Get-ChildItem",
+                "*.zip",
+                "|",
+                "ren",
+                "-NewName",
+                "{ $_.Name -replace '.zip', '.zip.disabled' }",
+            ],
+            "options": {
+                "cwd": "${env:APPDATA}\\VintagestoryData\\Mods"
+            }
         }
     ]
 }
