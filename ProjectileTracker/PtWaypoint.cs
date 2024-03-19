@@ -76,6 +76,10 @@ class PtWaypoint
                     api.Logger.Log(EnumLogType.Error, "Orphaned projectile " + p.EntityId + " had a waypoint for player " + waypoint.OwningPlayerUid + " but that player could not be retrieved.");
                     continue;
                 }
+
+                waypoints.Remove(waypoint);
+                ResendWaypoints.Invoke(maplayer, new Object[] {player as IServerPlayer});
+                RebuildMapComponents.Invoke(maplayer, null);
             }
         }
     } //End of RemoveOrphanedWaypoint()
