@@ -31,6 +31,7 @@ namespace ProjectileTracker.EntityBehavior {
         public override void OnEntitySpawn()
         {
             EntityProjectile checkArrow = entity as EntityProjectile;
+            ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntitySpawn();
             projectileLanded.Add(checkArrow.EntityId, false);
 
@@ -42,6 +43,7 @@ namespace ProjectileTracker.EntityBehavior {
             EntityProjectile checkArrow = entity as EntityProjectile;
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntityDespawn(despawn);
+            if(ProjectileTrackerModSystem.serverLoaded == false) return;
             api.Logger.Log(EnumLogType.Debug, "Projectile Despawned: " + checkArrow.EntityId);
             //Remove waypoint referring to this projectile entity if it exists.
             //RemoveWaypoint(api, checkArrow);
