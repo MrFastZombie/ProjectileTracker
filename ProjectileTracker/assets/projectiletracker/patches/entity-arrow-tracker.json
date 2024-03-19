@@ -3,15 +3,6 @@
         "op": "add",
         "side": "server",
         "file": "game:entities/arrow",
-        "path": "/client/behaviors/-",
-        "value": {
-          "code": "InjectProjectileTracker"
-        }
-    },
-    {
-        "op": "add",
-        "side": "server",
-        "file": "game:entities/arrow",
         "path": "/server/behaviors/-",
         "value": {
           "code": "InjectProjectileTracker"
@@ -21,18 +12,9 @@
       "op": "add",
       "side": "server",
       "file": "game:entities/spear",
-      "path": "/client/behaviors/-",
-      "value": {
-        "code": "InjectProjectileTracker"
-      }
-  },
-  {
-      "op": "add",
-      "side": "server",
-      "file": "game:entities/spear",
       "path": "/server/behaviors/-",
       "value": {
         "code": "InjectProjectileTracker"
       }
-  }
+    }
 ]
