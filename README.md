@@ -1,0 +1,3 @@
+# NOTE: This project is under development and does not yet have a release. If you compile it yourself, please do not assume that it is currently in a working state.
+
+This is a mod for [Vintage Story](https://vintagestory.at/) that automatically creates and removes waypoints for projectiles that only you've fired. Other player's projectiles will not be tracked. Most of the code is server-side, so it will only work if the server also has the mod. While I may try to do a client-side mode if there is demand for it, the main reason for running server-side is so that waypoints can be updated without the player being near them.
