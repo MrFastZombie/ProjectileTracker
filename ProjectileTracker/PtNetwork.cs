@@ -33,6 +33,11 @@ class PtNetwork
         public string response;
     }
 
+    /// <summary>
+    /// Run when the server receives a message from a client.
+    /// </summary>
+    /// <param name="player"> Player who sent the message. </param>
+    /// <param name="msg"> The message from the client.</param>
     public void OnClientMessage(IServerPlayer player, NetworkApiResponse msg)
     {
         api.Logger.Log(EnumLogType.Debug, "Client Message: " + msg.response);
@@ -43,12 +48,22 @@ class PtNetwork
         
     }
 
+    /// <summary>
+    /// Get config from a player.
+    /// </summary>
+    /// <param name="api">Server's API.</param>
+    /// <param name="player">The player to get the config from.</param>
+    /// <returns>The player's config as a Ptconfig.</returns>
     public Ptconfig GetPtconfig(ICoreServerAPI api, IServerPlayer player)
     {
         serverChannel.SendPacket(new PtNetwork.NetworkApiMessage { message = "sendinfo" }, player);
         return api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
     }
 
+    /// <summary>
+    /// Run when a player joins the server. This will retrieve the player's config and send waypoint updates to the player.
+    /// </summary>
+    /// <param name="player">Player who joined.</param>
     public void OnPlayerJoin(IServerPlayer player) {
         serverChannel.SendPacket(new PtNetwork.NetworkApiMessage { message = "sendinfo" }, player);
         if(ProjectileTrackerModSystem.pendingWaypoints.ContainsKey(player.PlayerUID)) {
