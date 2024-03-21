@@ -1,16 +1,7 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
-using Vintagestory.API.Config;
-using Vintagestory.API.Datastructures;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
-using Vintagestory.API.Util;
-using System.Timers;
-using System;
-using System.Linq;
-using ProjectileTracker;
-using System.Reflection;
 using System.Collections.Generic;
 
 namespace ProjectileTracker.EntityBehavior {
@@ -43,7 +34,8 @@ namespace ProjectileTracker.EntityBehavior {
             EntityProjectile checkArrow = entity as EntityProjectile;
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntityDespawn(despawn);
-            if(ProjectileTrackerModSystem.serverLoaded == false) return;
+            //if(ProjectileTrackerModSystem.serverLoaded == false) return;
+            if(checkArrow.Alive) return;
             api.Logger.Log(EnumLogType.Debug, "Projectile Despawned: " + checkArrow.EntityId);
             //Remove waypoint referring to this projectile entity if it exists.
             //RemoveWaypoint(api, checkArrow);
@@ -59,10 +51,10 @@ namespace ProjectileTracker.EntityBehavior {
             if(checkArrow.FiredBy == null) return; //No point in making a waypoint if the player is null.
             if(checkArrow.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
 
-            //Figuring out how to make this work drove me nuts, but this appears to be the most reliable way to check if the projectile has landed without access to onCollided.
             if(projectileLanded[checkArrow.EntityId] == true) return;
             else {
-                if(checkArrow.ServerPos.XYZ == checkArrow.PreviousServerPos.XYZ) {
+                //if(checkArrow.ServerPos.XYZ == checkArrow.PreviousServerPos.XYZ) { //This used to be pretty accurate, has suddenly become too sensitive so I had to change to checking ApplyGravity.
+                if(!checkArrow.ApplyGravity) {
                     api.Logger.Log(EnumLogType.Debug, "Projectile" + checkArrow.EntityId + " has landed");
                     projectileLanded[checkArrow.EntityId] = true;
                     //CreateWaypoint(api, checkArrow);
