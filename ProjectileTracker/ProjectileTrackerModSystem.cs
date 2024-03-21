@@ -11,6 +11,7 @@ using Vintagestory.API.Util;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Datastructures;
 using Newtonsoft.Json.Linq;
+using Vintagestory.API.Config;
 
 namespace ProjectileTracker;
 
@@ -27,7 +28,7 @@ public class ProjectileTrackerModSystem : ModSystem
 
         clientConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
         if(clientConfig == null) {
-            api.Logger.Log(EnumLogType.Debug, "ProjectileTrackerConfig not found, will create a new one.");
+            api.Logger.Log(EnumLogType.Warning, Lang.Get("client-confignotfound"));
             clientConfig = new Ptconfig();
         }
 
@@ -43,7 +44,7 @@ public class ProjectileTrackerModSystem : ModSystem
     private void OnServerMessage(PtNetwork.NetworkApiMessage msg) {
         clientAPI.Logger.Log(EnumLogType.Debug, "Server Message: " + msg.message);
         if(msg.message == "sendinfo") clientChannel.SendPacket(new PtNetwork.NetworkApiResponse { response = "config |" + clientConfig.ToString()});
-        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage("Welcome back! " + msg.message[10..] + " Projectile Tracker waypoints were removed since your last login due to the projectiles being picked up or despawned.");
+        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage(Lang.Get("welcome", msg.message[10..]));
     }
 
     #endregion
@@ -71,12 +72,12 @@ public class ProjectileTrackerModSystem : ModSystem
         
         
         api.ChatCommands.Create("ptpurge")
-            .WithDescription("Purge all Projectile Tracker waypoints")
+            .WithDescription(Lang.Get("ptpurge-desc"))
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(new OnCommandDelegate(OnPurgeCommand));
 
         api.ChatCommands.Create("ptclearorphans")
-            .WithDescription("Clear all Projectile Tracker waypoints that no longer have a corresponding entity")
+            .WithDescription(Lang.Get("ptclearorphans-desc"))
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(new OnCommandDelegate(OnClearOrphansCommand));
 
@@ -108,16 +109,12 @@ public class ProjectileTrackerModSystem : ModSystem
             List<string> checkedTyped = new() { "EntityProjectile", "AdvancedEntityProjectile" }; //AdvancedEntityProjectile is for FSMLib.
 
             foreach (EntityProperties p in api.World.EntityTypes) {
-                JsonObject obj = new("'code': 'soup'");
-                List<Vintagestory.API.Common.Entities.EntityBehavior> b = new();
-                
                 if(checkedTyped.Contains(p.Class) && !sConfig.projectileBlacklist.Contains(p.Code.Path)) {
                     if(!sConfig.InjectModdedProjectiles && p.Code.Domain != "game") continue; //Only inject vanilla projectiles if InjectModdedProjectiles is false.
-
-                    api.Logger.Log(EnumLogType.Debug, "ProjectileTracker: Injecting entity " + p.Code.Path + " from class " + p.Class);
+                    
+                    api.Logger.Log(EnumLogType.Debug, Lang.Get("injecting", p.Code.Path, p.Class));
                     p.Server.BehaviorsAsJsonObj = p.Server.BehaviorsAsJsonObj.Prepend(ptBehaviorJson).ToArray();
-                }
-                //p.AddBehavior(new InjectProjectileTracker(p)); 
+                } 
             }
         }
     }
@@ -183,7 +180,6 @@ public class ProjectileTrackerModSystem : ModSystem
 
         byte[] wpdata = serverAPI.WorldManager.SaveGame.GetData("ptwaypoints");
         pendingWaypoints = wpdata == null ? new() : SerializerUtil.Deserialize<Dictionary<string, List<Waypoint>>>(wpdata);
-        serverAPI.Logger.Log(EnumLogType.Debug, "Stored Projectile Tracker waypoint updates loaded.");
     }
 
     #endregion

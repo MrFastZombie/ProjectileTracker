@@ -1,12 +1,11 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
-using Vintagestory.API.MathTools;
 using System.Linq;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
-using Vintagestory.API.Util;
+using Vintagestory.API.Config;
 
 namespace ProjectileTracker;
 class PtWaypoint
@@ -62,7 +61,7 @@ class PtWaypoint
         {
             if(waypoint.Title == "Projectile " + p.EntityId) {
                 if(player == null || forcestore) {
-                    api.Logger.Log(EnumLogType.Error, "Projectile " + p.EntityId + " had a waypoint for player " + waypoint.OwningPlayerUid + " but that player could not be retrieved. If this happened during a world load, this can be ignored!");
+                    api.Logger.Log(EnumLogType.Error, Lang.Get("remove-error", p.EntityId, waypoint.OwningPlayerUid));
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }
@@ -110,7 +109,7 @@ class PtWaypoint
             }
             catch (System.Exception) //I reckon this might happen if the player crashes on connect.
             {
-                serverAPI.Logger.Log(EnumLogType.Error, "Projectile Tracker failed to send waypoints for player " + playerUID + " to the client. Stored waypoint updates have not been cleared.");
+                serverAPI.Logger.Log(EnumLogType.Error, Lang.Get("process-error", playerUID));
             }
         }
     } //End of ProcessStoredWaypoints()
@@ -131,7 +130,7 @@ class PtWaypoint
             if(waypoint.Title == "Projectile " + p.EntityId) {
                 var player = api.World.PlayerByUid(waypoint.OwningPlayerUid);
                 if(player == null) {
-                    api.Logger.Log(EnumLogType.Error, "Orphaned projectile " + p.EntityId + " had a waypoint for player " + waypoint.OwningPlayerUid + " but that player could not be retrieved.");
+                    api.Logger.Log(EnumLogType.Error, Lang.Get("remove-error-orphan", p.EntityId, waypoint.OwningPlayerUid));
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }

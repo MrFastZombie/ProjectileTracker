@@ -31,11 +31,8 @@ namespace ProjectileTracker.EntityBehavior {
             EntityProjectile checkArrow = entity as EntityProjectile;
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntityDespawn(despawn);
-            //if(ProjectileTrackerModSystem.serverLoaded == false) return;
-            if(checkArrow.Alive) return;
-            api.Logger.Log(EnumLogType.Debug, "Projectile Despawned: " + checkArrow.EntityId);
-            //Remove waypoint referring to this projectile entity if it exists.
-            //RemoveWaypoint(api, checkArrow);
+            
+            if(checkArrow.Alive) return; //On world load entities often report being despawned when they are not.
             ptWaypoint.RemoveWaypoint(api, checkArrow);
         }
 
@@ -47,14 +44,13 @@ namespace ProjectileTracker.EntityBehavior {
 
             if(checkArrow.FiredBy == null) return; //No point in making a waypoint if the player is null.
             if(checkArrow.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
+            if(projectileLanded.ContainsKey(checkArrow.EntityId) == false) return;
 
             if(projectileLanded[checkArrow.EntityId] == true) return;
             else {
                 //if(checkArrow.ServerPos.XYZ == checkArrow.PreviousServerPos.XYZ) { //This used to be pretty accurate, has suddenly become too sensitive so I had to change to checking ApplyGravity.
                 if(!checkArrow.ApplyGravity) {
-                    api.Logger.Log(EnumLogType.Debug, "Projectile" + checkArrow.EntityId + " has landed");
                     projectileLanded[checkArrow.EntityId] = true;
-                    //CreateWaypoint(api, checkArrow);
                     ptWaypoint.CreateWaypoint(api, checkArrow);
                 }
             }
