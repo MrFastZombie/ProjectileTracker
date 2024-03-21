@@ -1,5 +1,4 @@
 {
-    "waypoint-name": "Projectile ",
     "injecting": "ProjectileTracker: Injecting entity {0} from class {1}",
     "ptpurge-desc": "Purge all Projectile Tracker waypoints",
     "ptclearorphans-desc": "Clear all Projectile Tracker waypoints that no longer have a corresponding entity",
