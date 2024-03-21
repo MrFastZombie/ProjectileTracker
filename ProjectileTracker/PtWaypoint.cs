@@ -27,7 +27,7 @@ class PtWaypoint
         var player = (p.FiredBy as EntityPlayer).Player as IServerPlayer;
         Ptconfig playerConfig = ProjectileTrackerModSystem.clientConfigs[player.PlayerUID];
 
-        if(playerConfig == null || !playerConfig.EnableProjectileTracker) return; //Don't create a waypoint if either the player does not have the mod or if they disabled the mod in the config
+        if(playerConfig == null || playerConfig.projectileBlacklist.Contains(p.Code.Path) || !playerConfig.EnableProjectileTracker) return; //Don't create a waypoint if either the player does not have the mod or if they disabled the mod in the config
 
         Waypoint newWaypoint = new() {
             Position = p.ServerPos.XYZ,
@@ -61,7 +61,7 @@ class PtWaypoint
         {
             if(waypoint.Title == "Projectile " + p.EntityId) {
                 if(player == null || forcestore) {
-                    api.Logger.Log(EnumLogType.Error, Lang.Get("remove-error", p.EntityId, waypoint.OwningPlayerUid));
+                    api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error", p.EntityId, waypoint.OwningPlayerUid));
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }
@@ -109,7 +109,7 @@ class PtWaypoint
             }
             catch (System.Exception) //I reckon this might happen if the player crashes on connect.
             {
-                serverAPI.Logger.Log(EnumLogType.Error, Lang.Get("process-error", playerUID));
+                serverAPI.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:process-error", playerUID));
             }
         }
     } //End of ProcessStoredWaypoints()
@@ -130,7 +130,7 @@ class PtWaypoint
             if(waypoint.Title == "Projectile " + p.EntityId) {
                 var player = api.World.PlayerByUid(waypoint.OwningPlayerUid);
                 if(player == null) {
-                    api.Logger.Log(EnumLogType.Error, Lang.Get("remove-error-orphan", p.EntityId, waypoint.OwningPlayerUid));
+                    api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error-orphan", p.EntityId, waypoint.OwningPlayerUid));
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }

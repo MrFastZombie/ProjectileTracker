@@ -28,7 +28,7 @@ public class ProjectileTrackerModSystem : ModSystem
 
         clientConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
         if(clientConfig == null) {
-            api.Logger.Log(EnumLogType.Warning, Lang.Get("client-confignotfound"));
+            api.Logger.Log(EnumLogType.Warning, Lang.Get("projectiletracker:client-confignotfound"));
             clientConfig = new Ptconfig();
         }
 
@@ -44,7 +44,7 @@ public class ProjectileTrackerModSystem : ModSystem
     private void OnServerMessage(PtNetwork.NetworkApiMessage msg) {
         clientAPI.Logger.Log(EnumLogType.Debug, "Server Message: " + msg.message);
         if(msg.message == "sendinfo") clientChannel.SendPacket(new PtNetwork.NetworkApiResponse { response = "config |" + clientConfig.ToString()});
-        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage(Lang.Get("welcome", msg.message[10..]));
+        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage(Lang.Get("projectiletracker:welcome", msg.message[10..]));
     }
 
     #endregion
@@ -72,12 +72,12 @@ public class ProjectileTrackerModSystem : ModSystem
         
         
         api.ChatCommands.Create("ptpurge")
-            .WithDescription(Lang.Get("ptpurge-desc"))
+            .WithDescription(Lang.Get("projectiletracker:ptpurge-desc"))
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(new OnCommandDelegate(OnPurgeCommand));
 
         api.ChatCommands.Create("ptclearorphans")
-            .WithDescription(Lang.Get("ptclearorphans-desc"))
+            .WithDescription(Lang.Get("projectiletracker:ptclearorphans-desc"))
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(new OnCommandDelegate(OnClearOrphansCommand));
 
@@ -112,7 +112,7 @@ public class ProjectileTrackerModSystem : ModSystem
                 if(checkedTyped.Contains(p.Class) && !sConfig.projectileBlacklist.Contains(p.Code.Path)) {
                     if(!sConfig.InjectModdedProjectiles && p.Code.Domain != "game") continue; //Only inject vanilla projectiles if InjectModdedProjectiles is false.
                     
-                    api.Logger.Log(EnumLogType.Debug, Lang.Get("injecting", p.Code.Path, p.Class));
+                    api.Logger.Log(EnumLogType.Debug, Lang.GetMatching("projectiletracker:injecting", p.Code.Path, p.Class));
                     p.Server.BehaviorsAsJsonObj = p.Server.BehaviorsAsJsonObj.Prepend(ptBehaviorJson).ToArray();
                 } 
             }
