@@ -2,6 +2,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using ProtoBuf;
 using Newtonsoft.Json;
+using Vintagestory.API.Config;
 
 namespace ProjectileTracker;
 class PtNetwork
@@ -40,10 +41,12 @@ class PtNetwork
     /// <param name="msg"> The message from the client.</param>
     public void OnClientMessage(IServerPlayer player, NetworkApiResponse msg)
     {
-        api.Logger.Log(EnumLogType.Debug, "Client Message: " + msg.response);
         if(msg.response.StartsWith("config |")) {
+            api.Logger.Log(EnumLogType.Debug, Lang.Get("projectiletracker:config-log", player.PlayerName, player.PlayerUID));
             Ptconfig newConfig = JsonConvert.DeserializeObject<Ptconfig>(msg.response[8..]);
             ProjectileTrackerModSystem.clientConfigs[player.PlayerUID] = newConfig;
+        } else {
+            api.Logger.Log(EnumLogType.Debug, "Client Message: " + msg.response); //The config packet causes a logging error we will turn off this log line for that.
         }
         
     }

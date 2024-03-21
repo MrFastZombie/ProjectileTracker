@@ -6,5 +6,6 @@
     "welcome": "{0} Projectile Tracker waypoints were removed since your last login due to the projectiles being picked up or despawned.",
     "remove-error": "Projectile Tracker: Projectile {0} had a waypoint for player {1} but that player could not be retrieved. If this happened during a world load, this can be ignored.",
     "remove-error-orphan": "Projectile Tracker: Orphaned projectile {0} had a waypoint for player {1} but that player could not be retrieved.",
-    "process-error": "Projectile Tracker: failed to send waypoints for player {0} to the client. Stored waypoint updates have not been cleared."
+    "process-error": "Projectile Tracker: failed to send waypoints for player {0} to the client. Stored waypoint updates have not been cleared.",
+    "config-log": "Got config from {0} ({1})"
 }
