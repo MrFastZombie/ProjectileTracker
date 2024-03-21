@@ -25,9 +25,6 @@ namespace ProjectileTracker.EntityBehavior {
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntitySpawn();
             projectileLanded.Add(checkArrow.EntityId, false);
-
-            //ERROR: An exception of type 'System.NullReferenceException' occurred in ProjectileTracker.dll but was not handled in user code: 'Object reference not set to an instance of an object.'
-            //api.Logger.Log(EnumLogType.Event, player.GetName() + " fired a projectile with ID: " + checkArrow.EntityId);
         }
         public override void OnEntityDespawn(EntityDespawnData despawn)
         {
