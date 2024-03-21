@@ -8,6 +8,9 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using Vintagestory.API.Util;
+using Vintagestory.API.Common.Entities;
+using Vintagestory.API.Datastructures;
+using Newtonsoft.Json.Linq;
 
 namespace ProjectileTracker;
 
@@ -40,7 +43,7 @@ public class ProjectileTrackerModSystem : ModSystem
     private void OnServerMessage(PtNetwork.NetworkApiMessage msg) {
         clientAPI.Logger.Log(EnumLogType.Debug, "Server Message: " + msg.message);
         if(msg.message == "sendinfo") clientChannel.SendPacket(new PtNetwork.NetworkApiResponse { response = "config |" + clientConfig.ToString()});
-        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage("Welcome back! " + msg.message[9..] + " Projectile Tracker waypoints were removed since your last login due to the projectiles being picked up or despawned.");
+        if(msg.message.StartsWith("wpupdate |") && clientConfig.EnableProjectileTracker && clientConfig.allowWelcomeMessage) clientAPI.ShowChatMessage("Welcome back! " + msg.message[10..] + " Projectile Tracker waypoints were removed since your last login due to the projectiles being picked up or despawned.");
     }
 
     #endregion
@@ -52,6 +55,7 @@ public class ProjectileTrackerModSystem : ModSystem
     public static Dictionary<string, Ptconfig> clientConfigs = new();
     public static Dictionary<string, List<Waypoint>> pendingWaypoints = new();
     public static bool serverLoaded = false;
+    private Ptconfig serverConfig;
     //IServerNetworkChannel serverChannel;
 
     public override void StartServerSide(ICoreServerAPI api)
@@ -62,6 +66,9 @@ public class ProjectileTrackerModSystem : ModSystem
         //var waypoints = (api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer).Waypoints;
 
         serverNetwork = new(api);
+
+        serverConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
+        
         
         api.ChatCommands.Create("ptpurge")
             .WithDescription("Purge all Projectile Tracker waypoints")
@@ -78,7 +85,41 @@ public class ProjectileTrackerModSystem : ModSystem
         api.Event.SaveGameLoaded += OnSaveGameLoading;
         api.Event.GameWorldSave += OnSaveGameSaving;
         api.Event.SaveGameLoaded += OnServerLoaded;
+        //api.Event.OnEntitySpawn += OnEntitySpawn;
+
+        api.StoreModConfig(serverConfig, "ProjectileTrackerConfig.json");
+    }
+
+    private struct NewBehavior //Thank you Maltiez for having an example of this method for adding entity behaviors in FSMlib.
+    { 
+         public string code; 
+    }
+
+    public override void AssetsFinalize(ICoreAPI api)
+    {
+        base.AssetsFinalize(api);
+
+        Ptconfig sConfig =api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
+
+        NewBehavior ptBehavior = new() {code = "InjectProjectileTracker"};
+        JsonObject ptBehaviorJson = new(JToken.FromObject(ptBehavior));
         
+        if(api.Side == EnumAppSide.Server) {
+            List<string> checkedTyped = new() { "EntityProjectile", "AdvancedEntityProjectile" }; //AdvancedEntityProjectile is for FSMLib.
+
+            foreach (EntityProperties p in api.World.EntityTypes) {
+                JsonObject obj = new("'code': 'soup'");
+                List<Vintagestory.API.Common.Entities.EntityBehavior> b = new();
+                
+                if(checkedTyped.Contains(p.Class) && !sConfig.projectileBlacklist.Contains(p.Code.Path)) {
+                    if(!sConfig.InjectModdedProjectiles && p.Code.Domain != "game") continue; //Only inject vanilla projectiles if InjectModdedProjectiles is false.
+
+                    api.Logger.Log(EnumLogType.Debug, "ProjectileTracker: Injecting entity " + p.Code.Path + " from class " + p.Class);
+                    p.Server.BehaviorsAsJsonObj = p.Server.BehaviorsAsJsonObj.Prepend(ptBehaviorJson).ToArray();
+                }
+                //p.AddBehavior(new InjectProjectileTracker(p)); 
+            }
+        }
     }
 
     private void Event_PlayerJoin(IServerPlayer player)

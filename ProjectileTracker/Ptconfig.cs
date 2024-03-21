@@ -11,6 +11,8 @@ public class Ptconfig
     public bool allowWelcomeMessage = true;
     public string icon = "ptarrow";
     public string color = "#f9d0dc";
+    public bool InjectModdedProjectiles = true;
+    public string[] projectileBlacklist = System.Array.Empty<string>();
 
     public override string ToString()
     {
