@@ -89,29 +89,30 @@ class PtWaypoint
     /// <param name="playerUID">UID of the player.</param>
     /// <param name="serverAPI">Server's API.</param>
     public void ProcessStoredWaypoints(string playerUID, ICoreServerAPI serverAPI) {
-        if(!ProjectileTrackerModSystem.pendingWaypoints.ContainsKey(playerUID)) return;
-        List<Waypoint> storedWaypoints = ProjectileTrackerModSystem.pendingWaypoints[playerUID].ToList();
-        var waypoints = getWaypoints(serverAPI);
-
+        if(!ProjectileTrackerModSystem.pendingWaypointNames.ContainsKey(playerUID)) return;
+        List<string> wpnames = ProjectileTrackerModSystem.pendingWaypointNames[playerUID].ToList();
         var maplayer = serverAPI.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
+        var waypoints = getWaypoints(serverAPI);
+        bool success = true;
 
-        foreach (Waypoint waypoint in storedWaypoints)
-        {
-            if(waypoint.Title.StartsWith("Projectile ")) {
+        foreach (Waypoint waypoint in waypoints.ToList()) {
+            if(wpnames.Contains(waypoint.Title) && waypoint.OwningPlayerUid == playerUID) {
                 waypoints.Remove(waypoint);
             }
-
-            try
-            {
-                ResendWaypoints.Invoke(maplayer, new Object[] {serverAPI.World.PlayerByUid(playerUID) as IServerPlayer});
-                RebuildMapComponents.Invoke(maplayer, null);
-                ProjectileTrackerModSystem.pendingWaypoints.Remove(playerUID);
-            }
-            catch (System.Exception) //I reckon this might happen if the player crashes on connect.
-            {
-                serverAPI.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:process-error", playerUID));
-            }
         }
+
+        try
+        {
+            ResendWaypoints.Invoke(maplayer, new Object[] {serverAPI.World.PlayerByUid(playerUID) as IServerPlayer});
+            RebuildMapComponents.Invoke(maplayer, null);
+        }
+        catch (System.Exception) //I reckon this might happen if the player crashes on connect.
+        {
+            success = false;
+            serverAPI.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:process-error", playerUID));
+        }
+
+        if(success) ProjectileTrackerModSystem.pendingWaypointNames.Remove(playerUID);
     } //End of ProcessStoredWaypoints()
 
     // ------------------------------------------------------------------------------------Helper Functions------------------------------------------------------------------------------------
@@ -148,8 +149,8 @@ class PtWaypoint
     /// <param name="playerUID">UID of the player.</param>
     /// <param name="wp">Waypoint that needs to be stored.</param>
     private static void StoreWaypoint(string playerUID, Waypoint wp) {
-        if(!ProjectileTrackerModSystem.pendingWaypoints.ContainsKey(playerUID)) ProjectileTrackerModSystem.pendingWaypoints[playerUID] = new();
-        ProjectileTrackerModSystem.pendingWaypoints[playerUID].Add(wp);
+        if(!ProjectileTrackerModSystem.pendingWaypointNames.ContainsKey(playerUID)) ProjectileTrackerModSystem.pendingWaypointNames[playerUID] = new();
+        ProjectileTrackerModSystem.pendingWaypointNames[playerUID].Add(wp.Title);
     } //End of StoreWaypoint()
 
 } //End of PtWaypoint

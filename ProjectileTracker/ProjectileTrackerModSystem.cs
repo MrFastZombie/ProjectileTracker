@@ -26,6 +26,8 @@ public class ProjectileTrackerModSystem : ModSystem
         clientAPI = api;
         base.Start(api);
 
+        api.RegisterEntityBehaviorClass("InjectProjectileTracker", typeof(InjectProjectileTracker));
+
         clientConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
         if(clientConfig == null) {
             api.Logger.Log(EnumLogType.Warning, Lang.Get("projectiletracker:client-confignotfound"));
@@ -51,11 +53,10 @@ public class ProjectileTrackerModSystem : ModSystem
 
     #region Server
     ICoreServerAPI serverAPI;
-    PtNetwork serverNetwork;
+    static PtNetwork serverNetwork;
 
     public static Dictionary<string, Ptconfig> clientConfigs = new();
-    public static Dictionary<string, List<Waypoint>> pendingWaypoints = new();
-    public static bool serverLoaded = false;
+    public static Dictionary<string, List<string>> pendingWaypointNames = new();
     private Ptconfig serverConfig;
     //IServerNetworkChannel serverChannel;
 
@@ -85,7 +86,7 @@ public class ProjectileTrackerModSystem : ModSystem
         api.Event.PlayerNowPlaying += Event_PlayerJoin;
         api.Event.SaveGameLoaded += OnSaveGameLoading;
         api.Event.GameWorldSave += OnSaveGameSaving;
-        api.Event.SaveGameLoaded += OnServerLoaded;
+        //api.Event.SaveGameLoaded += OnServerLoaded;
         //api.Event.OnEntitySpawn += OnEntitySpawn;
 
         api.StoreModConfig(serverConfig, "ProjectileTrackerConfig.json");
@@ -122,11 +123,6 @@ public class ProjectileTrackerModSystem : ModSystem
     private void Event_PlayerJoin(IServerPlayer player)
     {
         serverNetwork.OnPlayerJoin(player);
-    }
-
-    private void OnServerLoaded()
-    {
-        serverLoaded = true;
     }
 
     private TextCommandResult OnPurgeCommand(TextCommandCallingArgs args) {
@@ -170,16 +166,17 @@ public class ProjectileTrackerModSystem : ModSystem
     }
 
     private void OnSaveGameSaving() {
-        serverAPI.WorldManager.SaveGame.StoreData("ptconfigs", SerializerUtil.Serialize(clientConfigs));
-        serverAPI.WorldManager.SaveGame.StoreData("ptwaypoints", SerializerUtil.Serialize(pendingWaypoints));
+        //serverAPI.WorldManager.SaveGame.StoreData("ptconfigs", SerializerUtil.Serialize(clientConfigs));
+        serverAPI.WorldManager.SaveGame.StoreData("ptwaypointnames", SerializerUtil.Serialize(pendingWaypointNames));
     }
     private void OnSaveGameLoading() {
         /*byte[] data = serverAPI.WorldManager.SaveGame.GetData("ptconfigs");
         clientConfigs = data == null ? new() : SerializerUtil.Deserialize<Dictionary<string, Ptconfig>>(data);
         serverAPI.Logger.Log(EnumLogType.Debug, "Stored Projectile Tracker configs loaded.");*/
 
-        byte[] wpdata = serverAPI.WorldManager.SaveGame.GetData("ptwaypoints");
-        pendingWaypoints = wpdata == null ? new() : SerializerUtil.Deserialize<Dictionary<string, List<Waypoint>>>(wpdata);
+        byte[] wpndata = serverAPI.WorldManager.SaveGame.GetData("ptwaypointnames");
+        pendingWaypointNames = wpndata == null ? new() : SerializerUtil.Deserialize<Dictionary<string, List<string>>>(wpndata);
+        serverAPI.Logger.Debug("Stored Projectile Tracker waypoint names loaded.");
     }
 
     #endregion

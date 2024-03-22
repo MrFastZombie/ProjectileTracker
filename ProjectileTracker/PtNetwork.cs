@@ -69,8 +69,8 @@ class PtNetwork
     /// <param name="player">Player who joined.</param>
     public void OnPlayerJoin(IServerPlayer player) {
         serverChannel.SendPacket(new PtNetwork.NetworkApiMessage { message = "sendinfo" }, player);
-        if(ProjectileTrackerModSystem.pendingWaypoints.ContainsKey(player.PlayerUID)) {
-            int wpcount = ProjectileTrackerModSystem.pendingWaypoints[player.PlayerUID].Count;
+        if(ProjectileTrackerModSystem.pendingWaypointNames.ContainsKey(player.PlayerUID)) {
+            int wpcount = ProjectileTrackerModSystem.pendingWaypointNames[player.PlayerUID].Count;
             ptWaypoint.ProcessStoredWaypoints(player.PlayerUID, api);
             serverChannel.SendPacket(new PtNetwork.NetworkApiMessage { message = "wpupdate |" + wpcount }, player);
         }
