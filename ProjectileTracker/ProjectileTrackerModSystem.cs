@@ -82,6 +82,12 @@ public class ProjectileTrackerModSystem : ModSystem
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(new OnCommandDelegate(OnClearOrphansCommand));
 
+        api.ChatCommands.Create("ptremovepending")
+            .WithDescription(Lang.Get("projectiletracker:ptremovepending-desc"))
+            .RequiresPrivilege(Privilege.ban)
+            .WithArgs(api.ChatCommands.Parsers.Word("id or all"))
+            .HandleWith(new OnCommandDelegate(OnRemovePendingCommand));
+
         //api.Event.PlayerJoin += Event_PlayerJoin;
         api.Event.PlayerNowPlaying += Event_PlayerJoin;
         api.Event.SaveGameLoaded += OnSaveGameLoading;
@@ -161,6 +167,16 @@ public class ProjectileTrackerModSystem : ModSystem
 
             }
         }
+
+        return TextCommandResult.Success();
+    }
+
+    private TextCommandResult OnRemovePendingCommand(TextCommandCallingArgs args) {
+        string id = args.LastArg.ToString();
+
+        if(id == "all") pendingWaypointNames.Clear();
+        else if(pendingWaypointNames.ContainsKey(id)) pendingWaypointNames.Remove(id);
+        else return TextCommandResult.Error(Lang.Get("projectiletracker:ptremovepending-error"));
 
         return TextCommandResult.Success();
     }
