@@ -21,14 +21,21 @@ namespace ProjectileTracker.EntityBehavior {
 
         public override void OnEntitySpawn()
         {
-            EntityProjectile checkArrow = entity as EntityProjectile;
+            dynamic checkArrow = entity;
+                if(checkArrow == null) return;
+                if(checkArrow.Api == null) return;
+
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntitySpawn();
+            // checkArrow.GetType().FullName -> "CombatOverhaul.RangedSystems.ProjectileEntity"
             projectileLanded.Add(checkArrow.EntityId, false);
         }
         public override void OnEntityDespawn(EntityDespawnData despawn)
         {
-            EntityProjectile checkArrow = entity as EntityProjectile;
+            dynamic checkArrow = entity;
+                if(checkArrow == null) return;
+                if(checkArrow.Api == null) return;
+
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntityDespawn(despawn);
             
@@ -38,10 +45,14 @@ namespace ProjectileTracker.EntityBehavior {
 
         public override void OnGameTick(float deltaTime)
         {
-            EntityProjectile checkArrow = entity as EntityProjectile;
+            dynamic checkArrow = entity;
+                if(checkArrow == null) return;
+                if(checkArrow.Api == null) return;
+
             ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnGameTick(deltaTime);
 
+            if(checkArrow.GetType().GetProperty("FiredBy") == null) return;
             if(checkArrow.FiredBy == null) return; //No point in making a waypoint if the player is null.
             if(checkArrow.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
             if(projectileLanded.ContainsKey(checkArrow.EntityId) == false) return;

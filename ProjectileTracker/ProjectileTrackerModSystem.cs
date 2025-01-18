@@ -113,7 +113,7 @@ public class ProjectileTrackerModSystem : ModSystem
         JsonObject ptBehaviorJson = new(JToken.FromObject(ptBehavior));
         
         if(api.Side == EnumAppSide.Server) {
-            List<string> checkedTyped = new() { "EntityProjectile", "AdvancedEntityProjectile" }; //AdvancedEntityProjectile is for FSMLib.
+            List<string> checkedTyped = new() { "EntityProjectile", "AdvancedEntityProjectile", "CombatOverhaul:Projectile" }; //AdvancedEntityProjectile is for FSMLib.
 
             foreach (EntityProperties p in api.World.EntityTypes) {
                 if(checkedTyped.Contains(p.Class) && !sConfig.projectileBlacklist.Contains(p.Code.Path)) {
