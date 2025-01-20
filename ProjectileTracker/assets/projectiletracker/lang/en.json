@@ -14,5 +14,6 @@
     "allowWelcomeMessageComment": "When joining a server, a welcome message will alert the user of waypoints that have been deleted since their last join. This setting controls if that is displayed.",
     "InjectModdedProjectilesComment": "If true: modded projectiles will be tracked. ",
     "IconComment": "The waypoint icon. Accepts any icon name from the Waypoint icon list. If you'd like an icon that is more precise, you can use 'x' or 'star1' instead. Invalid values will make it default to the circle icon.",
-    "ColorComment": "The HEX code for the color of the waypoint. You should be able to get it from an online color picker. Do not forget the #."
+    "ColorComment": "The HEX code for the color of the waypoint. You should be able to get it from an online color picker. Do not forget the #.",
+    "BlacklistComment": "An array of item names that will not be tracked. On the serverside, this will disable those projectiles for everyone but on the client side it will prevent waypoints being made for that client. Projectile names that are being tracked are listed in the server-debug log, and you can find them by searching 'Injecting entity'."
 }
