@@ -70,6 +70,10 @@ public class ProjectileTrackerModSystem : ModSystem
         serverNetwork = new(api);
 
         serverConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
+        if(serverConfig == null) {
+            api.Logger.Log(EnumLogType.Warning, Lang.Get("projectiletracker:client-confignotfound"));
+            serverConfig = new Ptconfig();
+        }
         
         
         api.ChatCommands.Create("ptpurge")
