@@ -6,7 +6,7 @@
         "MrFastZombie"
     ],
     "description": "This QOL mod automatically creates waypoints for launched projectiles and deletes them when the projectiles are retrieved.",
-    "version": "1.0.2",
+    "version": "1.0.3",
 	"side": "Universal",
     "requiredOnClient": "false",
     "requiredOnServer": "true",

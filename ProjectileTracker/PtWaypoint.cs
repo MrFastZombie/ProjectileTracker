@@ -25,6 +25,7 @@ class PtWaypoint
     public void CreateWaypoint(ICoreServerAPI api, PtEntity p) {
         var maplayer = api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
         var player = p.Player;
+            if(player == null) return;
         string path = p.Path;
         Ptconfig playerConfig = ProjectileTrackerModSystem.clientConfigs[player.PlayerUID];
 

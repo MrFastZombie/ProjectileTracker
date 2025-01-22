@@ -12,6 +12,7 @@ class PtEntity {
             if(entity.Api == null) Api = null;
             else Api = entity.Api as ICoreServerAPI;
             if(Entity.FiredBy == null) Player = null;
+            else if(Entity.FiredBy.GetType().FullName != "Vintagestory.API.Common.EntityPlayer") Player = null;
             else Player = Entity.FiredBy.Player as IServerPlayer;
             EntityId = entity.EntityId;
             Pos = Entity.ServerPos.XYZ;
@@ -24,6 +25,7 @@ class PtEntity {
             if(entity.Api == null) Api = null;
             else Api = entity.Api as ICoreServerAPI;
             if(Api.World.GetEntityById(Entity.ShooterId) == null) Player = null;
+            else if(Api.World.GetEntityById(Entity.ShooterId).GetType().FullName != "Vintagestory.API.Common.EntityPlayer") Player = null;
             else Player = Api.World.GetEntityById(Entity.ShooterId).Player as IServerPlayer;
             EntityId = entity.EntityId;
             Pos = Entity.ServerPos.XYZ;
