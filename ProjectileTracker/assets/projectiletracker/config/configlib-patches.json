@@ -32,12 +32,6 @@
         "comment": "ColorComment",
         "type": "color",
         "default": "#f9d0dc"
-      },
-      {
-        "code": "projectileBlacklist",
-        "comment": "BlacklistComment",
-        "type": "array",
-        "default": []
       }
     ]
   }
