@@ -111,7 +111,11 @@ public class ProjectileTrackerModSystem : ModSystem
     {
         base.AssetsFinalize(api);
 
-        Ptconfig sConfig =api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
+        Ptconfig sConfig = api.LoadModConfig<Ptconfig>("ProjectileTrackerConfig.json");
+        if(sConfig == null) {
+            api.Logger.Log(EnumLogType.Warning, Lang.Get("projectiletracker:client-confignotfound"));
+            sConfig = new Ptconfig();
+        }
 
         NewBehavior ptBehavior = new() {code = "InjectProjectileTracker"};
         JsonObject ptBehaviorJson = new(JToken.FromObject(ptBehavior));
@@ -128,6 +132,7 @@ public class ProjectileTrackerModSystem : ModSystem
                 } 
             }
         }
+        api.StoreModConfig(sConfig, "ProjectileTrackerConfig.json");
     }
 
     private void Event_PlayerJoin(IServerPlayer player)
