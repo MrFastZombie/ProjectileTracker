@@ -1,9 +1,5 @@
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
-using Vintagestory.GameContent;
-using System.Collections.Generic;
-using System.Resources;
 
 namespace ProjectileTracker;
 
