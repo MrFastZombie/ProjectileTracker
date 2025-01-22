@@ -10,6 +10,7 @@ namespace ProjectileTracker.EntityBehavior {
         private static Dictionary<long, bool> projectileLanded = new();
 
         private static PtWaypoint ptWaypoint = new();
+        private static PtEntity ptEntity;
 
         public InjectProjectileTracker(Entity entity) : base(entity) {
             
@@ -21,48 +22,38 @@ namespace ProjectileTracker.EntityBehavior {
 
         public override void OnEntitySpawn()
         {
-            dynamic checkArrow = entity;
-                if(checkArrow == null) return;
-                if(checkArrow.Api == null) return;
-
-            ICoreServerAPI api = entity.Api as ICoreServerAPI;
             base.OnEntitySpawn();
+            if(entity == null) return;
+            ptEntity = new PtEntity(entity);
             // checkArrow.GetType().FullName -> "CombatOverhaul.RangedSystems.ProjectileEntity"
-            projectileLanded.Add(checkArrow.EntityId, false);
+            projectileLanded.Add(ptEntity.EntityId, false);
         }
         public override void OnEntityDespawn(EntityDespawnData despawn)
         {
-            dynamic checkArrow = entity;
-                if(checkArrow == null) return;
-                if(checkArrow.Api == null) return;
-
-            ICoreServerAPI api = entity.Api as ICoreServerAPI;
+            ptEntity = new PtEntity(entity);
             base.OnEntityDespawn(despawn);
-            
-            if(checkArrow.Alive) return; //On world load entities often report being despawned when they are not.
-            ptWaypoint.RemoveWaypoint(api, checkArrow);
+
+            if(ptEntity.Alive) return; //On world load entities often report being despawned when they are not.
+            if(ptEntity.Api.Server.CurrentRunPhase != EnumServerRunPhase.RunGame) return;
+            ptWaypoint.RemoveWaypoint(ptEntity.Api, ptEntity);
         }
 
         public override void OnGameTick(float deltaTime)
         {
-            dynamic checkArrow = entity;
-                if(checkArrow == null) return;
-                if(checkArrow.Api == null) return;
-
-            ICoreServerAPI api = entity.Api as ICoreServerAPI;
+            ptEntity = new PtEntity(entity);
             base.OnGameTick(deltaTime);
 
-            if(checkArrow.GetType().GetProperty("FiredBy") == null) return;
-            if(checkArrow.FiredBy == null) return; //No point in making a waypoint if the player is null.
-            if(checkArrow.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
-            if(projectileLanded.ContainsKey(checkArrow.EntityId) == false) return;
+            //if(checkArrow.GetType().GetProperty("FiredBy") == null) return;
+            if(ptEntity == null) return; //No point in making a waypoint if the player is null.
+            if(ptEntity.State == EnumEntityState.Inactive) return;  //This will ensure that if a projectile exits the simulation distance that it will not create a waypoint until it is loaded again and lands.
+            if(projectileLanded.ContainsKey(ptEntity.EntityId) == false) return;
 
-            if(projectileLanded[checkArrow.EntityId] == true) return;
+            if(projectileLanded[ptEntity.EntityId] == true) return;
             else {
                 //if(checkArrow.ServerPos.XYZ == checkArrow.PreviousServerPos.XYZ) { //This used to be pretty accurate, has suddenly become too sensitive so I had to change to checking ApplyGravity.
-                if(!checkArrow.ApplyGravity) {
-                    projectileLanded[checkArrow.EntityId] = true;
-                    ptWaypoint.CreateWaypoint(api, checkArrow);
+                if(!ptEntity.ApplyGravity) {
+                    projectileLanded[ptEntity.EntityId] = true;
+                    ptWaypoint.CreateWaypoint(ptEntity.Api, ptEntity);
                 }
             }
 

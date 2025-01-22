@@ -22,17 +22,17 @@ class PtWaypoint
     /// </summary>
     /// <param name="api">Server's api.</param>
     /// <param name="p">The projectile to create a waypoint for.</param>
-    public void CreateWaypoint(ICoreServerAPI api, dynamic p) {
+    public void CreateWaypoint(ICoreServerAPI api, PtEntity p) {
         var maplayer = api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
-        var player = (p.FiredBy as EntityPlayer).Player as IServerPlayer;
-        string path = p.Code.Path;
+        var player = p.Player;
+        string path = p.Path;
         Ptconfig playerConfig = ProjectileTrackerModSystem.clientConfigs[player.PlayerUID];
 
         if(path == null) return;
         if(playerConfig == null || playerConfig.projectileBlacklist.Contains(path) || !playerConfig.EnableProjectileTracker) return; //Don't create a waypoint if either the player does not have the mod or if they disabled the mod in the config
 
         Waypoint newWaypoint = new() {
-            Position = p.ServerPos.XYZ,
+            Position = p.Pos,
             Title = "Projectile " + p.EntityId,
             Pinned = false,
             Icon = playerConfig.icon,
@@ -40,7 +40,7 @@ class PtWaypoint
             OwningPlayerUid = player.PlayerUID
         };
 
-        maplayer.AddWaypoint(newWaypoint, (p.FiredBy as EntityPlayer).Player as IServerPlayer);
+        maplayer.AddWaypoint(newWaypoint, p.Player);
     } // End of CreateWaypoint()
     
     /// <summary>
@@ -49,17 +49,16 @@ class PtWaypoint
     /// <param name="api">Server's api</param>
     /// <param name="p">Projectile to remove a waypoint for.</param>
     /// <param name="forcestore">Debug parameter that allows you to force a waypoint to be stored instead of being sent directly to the player.</param>
-    public void RemoveWaypoint(ICoreServerAPI api, dynamic p, bool forcestore = false) {
+    public void RemoveWaypoint(ICoreServerAPI api, PtEntity p, bool forcestore = false) {
         if(p == null) return;
-        if(p.GetType().GetProperty("FiredBy") == null) return;
-        if(p.FiredBy == null) {
+        if(p.Player == null) {
                 RemoveOrphanedWaypoint(api, p);
-                return; //When the world is reloaded, FiredBy becoems null on saved projectile entiities.
+                return; //When the world is reloaded, FiredBy becomes null on saved projectile entities.
         }
 
         var maplayer = api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
         var waypoints = getWaypoints(api);
-        var player = (p.FiredBy as EntityPlayer).Player as IServerPlayer;
+        var player = p.Player;
 
         foreach (Waypoint waypoint in waypoints.ToList().Where(w => w.OwningPlayerUid == player.PlayerUID)) //For every waypoint the player owns, check if it relates the the projectile and remove it if so.
         {
@@ -126,11 +125,11 @@ class PtWaypoint
     /// </summary>
     /// <param name="api">Server's api.</param>
     /// <param name="p">The Projectile that may have a waypoint.</param>
-    private void RemoveOrphanedWaypoint(ICoreServerAPI api, dynamic p) {
+    private void RemoveOrphanedWaypoint(ICoreServerAPI api, PtEntity p) {
         var maplayer = api.ModLoader.GetModSystem<WorldMapManager>().MapLayers.FirstOrDefault(ml => ml is WaypointMapLayer) as WaypointMapLayer;
         var waypoints = getWaypoints(api);
 
-        if(p == null || p.FiredBy == null) return;
+        if(p == null) return;
         
         foreach (Waypoint waypoint in waypoints.ToList())
         {
