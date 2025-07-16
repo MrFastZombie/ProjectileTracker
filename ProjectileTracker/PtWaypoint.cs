@@ -27,6 +27,9 @@ class PtWaypoint
         var player = p.Player;
             if(player == null) return;
         string path = p.Path;
+
+        if (ProjectileTrackerModSystem.clientConfigs.ContainsKey(player.PlayerUID) == false) return;
+
         Ptconfig playerConfig = ProjectileTrackerModSystem.clientConfigs[player.PlayerUID];
 
         if(path == null) return;
