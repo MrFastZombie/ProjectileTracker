@@ -67,6 +67,45 @@
             "options": {
                 "cwd": "${env:APPDATA}\\VintagestoryData\\Mods"
             }
+        },
+        {
+            "label": "Block Authserv",
+            "command": "powershell",
+            "type": "process",
+            "args": [
+                "Start-Process",
+                "powershell",
+                "-verb",
+                "runas",
+                "-ArgumentList",
+                "\"netsh",
+                "advfirewall",
+                "firewall",
+                "add",
+                "rule",
+                "name=BlockVSAuthServ",
+                "dir=out",
+                "action=block",
+                "remoteip=35.162.150.170\""
+            ]
+        },
+        {
+            "label": "Unblock Authserv",
+            "command": "powershell",
+            "type": "process",
+            "args": [
+                "Start-Process",
+                "powershell",
+                "-verb",
+                "runas",
+                "-ArgumentList",
+                "\"netsh",
+                "advfirewall",
+                "firewall",
+                "delete",
+                "rule",
+                "name=BlockVSAuthServ\""
+            ]
         }
     ]
 }
