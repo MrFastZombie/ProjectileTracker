@@ -67,8 +67,8 @@ class PtWaypoint
         foreach (Waypoint waypoint in waypoints.ToList().Where(w => w.OwningPlayerUid == player.PlayerUID)) //For every waypoint the player owns, check if it relates the the projectile and remove it if so.
         {
             if(waypoint.Title == "Projectile " + p.EntityId) {
-                if(player == null || forcestore) {
-                    api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error", p.EntityId, waypoint.OwningPlayerUid));
+                if(player == null || player.ConnectionState == EnumClientState.Offline || forcestore) {
+                    if (player == null) { api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error", p.EntityId, waypoint.OwningPlayerUid)); }
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }
@@ -138,9 +138,9 @@ class PtWaypoint
         foreach (Waypoint waypoint in waypoints.ToList())
         {
             if(waypoint.Title == "Projectile " + p.EntityId) {
-                var player = api.World.PlayerByUid(waypoint.OwningPlayerUid);
-                if(player == null) {
-                    api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error-orphan", p.EntityId, waypoint.OwningPlayerUid));
+                var player = api.World.PlayerByUid(waypoint.OwningPlayerUid) as IServerPlayer;
+                if(player == null || player.ConnectionState == EnumClientState.Offline) {
+                    if (player == null) { api.Logger.Log(EnumLogType.Error, Lang.Get("projectiletracker:remove-error-orphan", p.EntityId, waypoint.OwningPlayerUid)); }
                     StoreWaypoint(waypoint.OwningPlayerUid, waypoint);
                     continue;
                 }
