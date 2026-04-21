@@ -106,6 +106,13 @@
                 "rule",
                 "name=BlockVSAuthServ\""
             ]
+        },
+        {
+            "label": "Prepare Multiplayer Debug",
+            "dependsOn":[
+                "build (Cake)",
+                "Block Authserv"
+            ]
         }
     ]
 }

@@ -21,7 +21,33 @@
                 // "--openWorld" , "modding test world",
                 "--tracelog",
                 "--addModPath",
-                "${workspaceFolder}/ProjectileTracker/bin/Debug/Mods"
+                "${workspaceFolder}/ProjectileTracker/bin/Debug/Mods",
+                "--dataPath",
+                "${env:VINTAGE_STORY_PT1_DATA}"
+            ],
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Launch Client 2 (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${env:VINTAGE_STORY}/Vintagestory.exe",
+            "linux": {
+                "program": "${env:VINTAGE_STORY}/Vintagestory"
+            },
+            "osx": {
+                "program": "${env:VINTAGE_STORY}/Vintagestory"
+            },
+            "preLaunchTask": "build",
+            "args": [
+                // "--playStyle" , "preset-surviveandbuild",
+                // "--openWorld" , "modding test world",
+                "--tracelog",
+                "--addModPath",
+                "${workspaceFolder}/ProjectileTracker/bin/Debug/Mods",
+                "--dataPath",
+                "${env:VINTAGE_STORY_PT2_DATA}"
             ],
             "console": "internalConsole",
             "stopAtEntry": false
@@ -41,7 +67,9 @@
             "args": [
                 "--tracelog",
                 "--addModPath",
-                "${workspaceFolder}/ProjectileTracker/bin/Debug/Mods"
+                "${workspaceFolder}/ProjectileTracker/bin/Debug/Mods",
+                "--dataPath",
+                "${env:VINTAGE_STORY_PT1_DATA}"
             ],
             "console": "internalConsole",
             "stopAtEntry": false
@@ -56,6 +84,15 @@
             "cwd": "${workspaceFolder}/CakeBuild",
             "stopAtEntry": false,
             "console": "internalConsole"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Multiplayer Debug",
+            "configurations": ["Launch Server", "Launch Client (Debug)", "Launch Client 2 (Debug)"],
+            "preLaunchTask": "Prepare Multiplayer Debug",
+            "stopAll": true,
+            "postDebugTask": "Unblock Authserv"
         }
     ]
 }
